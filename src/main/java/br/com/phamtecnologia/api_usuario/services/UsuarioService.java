@@ -1,6 +1,7 @@
 package br.com.phamtecnologia.api_usuario.services;
 
 import br.com.phamtecnologia.api_usuario.components.CryptoComponent;
+import br.com.phamtecnologia.api_usuario.components.JwtTokenComponent;
 import br.com.phamtecnologia.api_usuario.dtos.AutenticarRequestDto;
 import br.com.phamtecnologia.api_usuario.dtos.AutenticarResponsedto;
 import br.com.phamtecnologia.api_usuario.dtos.UsuarioRequestDto;
@@ -23,6 +24,9 @@ public class UsuarioService {
 
     @Autowired
     private CryptoComponent cryptoComponent;
+
+    @Autowired
+    private JwtTokenComponent jwtTokenComponent;
 
     public UsuarioResponseDto criarUsuario (UsuarioRequestDto request) {
 
@@ -59,13 +63,16 @@ public class UsuarioService {
             throw new AcessoNegadoException();
         }
 
+        var token = jwtTokenComponent.getToken(usuario.getId(), usuario.getEmail(),
+                usuario.getPerfil().toString());
+
         return new AutenticarResponsedto(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getPerfil().toString(),
                 LocalDateTime.now(),
-                "<<TOKEN JWT>>"
+                token
         );
     }
 }
