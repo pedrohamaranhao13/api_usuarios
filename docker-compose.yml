@@ -1,5 +1,22 @@
 services:
 
+  api-usuarios:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apiusuarios_app
+    restart: always
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/bd_api_usuarios
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      - postgres
+    networks:
+      - apiusuarios-network
+
   postgres:
     image: postgres:16
     container_name: postgres_bd_api_usuarios
@@ -13,7 +30,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - rede_api
+      - apiusuarios-network
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -23,18 +40,18 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
-      - "8080:80"
+      - "5050:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - rede_api
     depends_on:
       - postgres
+    networks:
+      - apiusuarios-network
 
 volumes:
   postgres_data:
   pgadmin_data:
 
 networks:
-  rede_api:
+  apiusuarios-network:
     driver: bridge
